@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../context/AppContext'
 import YouTube from 'react-youtube';
 import { assets } from '../../assets/assets';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import humanizeDuration from 'humanize-duration';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -22,6 +22,7 @@ const Player = () => {
   } = useContext(AppContext);
 
   const { courseId } = useParams();
+  const navigate = useNavigate();
   const [courseData, setCourseData] = useState(null);
   const [progressData, setProgressData] = useState(null);
   const [openSections, setOpenSections] = useState({});
@@ -195,6 +196,39 @@ const Player = () => {
             <h1 className="text-xl font-bold">Rate this Course:</h1>
             <Rating initialRating={initialRating ?? 0} onRate={handleRate} />
           </div>
+
+          {/* Exam Section */}
+          {(() => {
+            const totalLectures = courseData?.courseContent?.reduce(
+              (sum, ch) => sum + (ch?.chapterContent?.length || 0),
+              0
+            ) || 0;
+            const completedLectures = progressData?.lectureCompleted?.length || 0;
+            const isCourseComplete = totalLectures > 0 && completedLectures >= totalLectures;
+            if (!isCourseComplete) return null;
+            return (
+              <div className="mt-4 p-4 border border-blue-200 rounded-lg bg-blue-50">
+                <h2 className="font-semibold text-blue-800 mb-1">Course Exam</h2>
+                <p className="text-sm text-blue-600 mb-3">
+                  You have completed all lectures. Take the final exam!
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => navigate(`/exam/${courseId}`)}
+                    className="px-5 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  >
+                    Take Exam
+                  </button>
+                  <button
+                    onClick={() => navigate(`/exam/result/${courseId}`)}
+                    className="px-5 py-2 border border-blue-400 text-blue-600 text-sm rounded hover:bg-blue-100"
+                  >
+                    View Result
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Right: Player */}
