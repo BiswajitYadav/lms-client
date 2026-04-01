@@ -92,15 +92,27 @@ const MyEnrollments = () => {
                                     <span className='text-xs ml-2'>Lectures</span>
                                 </td>
                                 <td className="px-4 py-3 max-sm:text-right">
-                                    <button
-                                        onClick={() => navigate?.('/player/' + course?._id)}
-                                        className='px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-600 max-sm:text-xs text-white'
-                                    >
-                                        {(progressArray?.[index]?.lectureCompleted || 0) /
-                                            (progressArray?.[index]?.totalLectures || 1) === 1
-                                            ? 'Completed'
-                                            : 'On Going'}
-                                    </button>
+                                    <div className="flex flex-col sm:flex-row gap-1.5 max-sm:items-end">
+                                        <button
+                                            onClick={() => navigate?.('/player/' + course?._id)}
+                                            className='px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-600 max-sm:text-xs text-white'
+                                        >
+                                            {(progressArray?.[index]?.lectureCompleted || 0) /
+                                                (progressArray?.[index]?.totalLectures || 1) === 1
+                                                ? 'Completed'
+                                                : 'On Going'}
+                                        </button>
+                                        {(progressArray?.[index]?.lectureCompleted || 0) ===
+                                            (progressArray?.[index]?.totalLectures || 0) &&
+                                            (progressArray?.[index]?.totalLectures || 0) > 0 && (
+                                                <button
+                                                    onClick={() => navigate?.('/exam/' + course?._id)}
+                                                    className='px-3 sm:px-5 py-1.5 sm:py-2 bg-green-600 max-sm:text-xs text-white'
+                                                >
+                                                    Take Exam
+                                                </button>
+                                            )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}
