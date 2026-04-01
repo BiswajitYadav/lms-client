@@ -127,7 +127,8 @@ const ExamResults = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-gray-400">
-                          {new Date(r.submittedAt).toLocaleString()}
+                          {new Date(r.submittedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}{', '}
+                          {new Date(r.submittedAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                         </td>
                       </tr>
                     ))}

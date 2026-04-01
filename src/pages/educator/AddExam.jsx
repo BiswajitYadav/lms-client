@@ -25,6 +25,9 @@ const AddExam = () => {
   const [questions, setQuestions] = useState([defaultQuestion()])
   const [saving, setSaving] = useState(false)
   const [loadingExam, setLoadingExam] = useState(false)
+  const [hasExistingExam, setHasExistingExam] = useState(false)
+  const [showDeleteExamModal, setShowDeleteExamModal] = useState(false)
+  const [deletingExam, setDeletingExam] = useState(false)
 
   const fetchCourses = async () => {
     try {
@@ -40,6 +43,7 @@ const AddExam = () => {
 
   const fetchExistingExam = async (courseId) => {
     setLoadingExam(true)
+    setHasExistingExam(false)
     try {
       const token = await getToken()
       const { data } = await axios.get(`${backendUrl}/api/exam/educator/${courseId}`, {
@@ -56,6 +60,7 @@ const AddExam = () => {
             answers: q.answers.map((a) => ({ option: a.option, isCorrect: a.isCorrect })),
           }))
         )
+        setHasExistingExam(true)
       } else {
         setTitle('')
         setDuration(30)
@@ -77,8 +82,38 @@ const AddExam = () => {
   }, [])
 
   useEffect(() => {
-    if (selectedCourseId) fetchExistingExam(selectedCourseId)
+    if (selectedCourseId) {
+      fetchExistingExam(selectedCourseId)
+    } else {
+      setHasExistingExam(false)
+    }
   }, [selectedCourseId])
+
+  const handleDeleteExam = async () => {
+    if (!selectedCourseId) return
+    setDeletingExam(true)
+    try {
+      const token = await getToken()
+      const { data } = await axios.delete(`${backendUrl}/api/exam/${selectedCourseId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (data.success) {
+        toast.success(data.message || 'Exam deleted successfully.')
+        setHasExistingExam(false)
+        setTitle('')
+        setDuration(30)
+        setPassingScore(50)
+        setQuestions([defaultQuestion()])
+        setShowDeleteExamModal(false)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    } finally {
+      setDeletingExam(false)
+    }
+  }
 
   const addQuestion = () => setQuestions((prev) => [...prev, defaultQuestion()])
 
@@ -328,17 +363,56 @@ const AddExam = () => {
                 </button>
               </div>
 
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-8 py-2.5 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 disabled:opacity-50"
-              >
-                {saving ? 'Saving...' : 'Save Exam'}
-              </button>
+              <div className="flex items-center justify-between">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-8 py-2.5 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Save Exam'}
+                </button>
+                {hasExistingExam && (
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteExamModal(true)}
+                    className="px-6 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded font-medium hover:bg-red-100"
+                  >
+                    Delete Exam
+                  </button>
+                )}
+              </div>
             </>
           )
         )}
       </form>
+
+      {/* Delete Exam Confirmation Modal */}
+      {showDeleteExamModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Delete Exam</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete this exam? All student results for this exam will also be removed. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteExamModal(false)}
+                className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                disabled={deletingExam}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteExam}
+                disabled={deletingExam}
+                className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              >
+                {deletingExam ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
