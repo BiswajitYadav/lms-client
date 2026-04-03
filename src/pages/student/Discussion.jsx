@@ -11,7 +11,7 @@ import Loading from '../../components/student/Loading';
 const Avatar = ({ src, name }) => (
   src
     ? <img src={src} alt={name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-    : <div className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-semibold text-sm flex-shrink-0">
+    : <div role="img" aria-label={name} className="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 font-semibold text-sm flex-shrink-0">
         {name?.[0]?.toUpperCase() || '?'}
       </div>
 );
@@ -458,7 +458,7 @@ const Discussion = () => {
   const currentUserId = userData?._id;
   const isEnrolled = enrolledCourses?.some(c => c._id === courseId) || isEducator;
 
-  const fetchDiscussions = async () => {
+  const fetchDiscussions = React.useCallback(async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/api/discussion/${courseId}`);
       if (data.success) {
@@ -477,11 +477,11 @@ const Discussion = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [backendUrl, courseId]);
 
   useEffect(() => {
     fetchDiscussions();
-  }, [courseId]);
+  }, [fetchDiscussions]);
 
   const handleNewPost = async (e) => {
     e.preventDefault();
