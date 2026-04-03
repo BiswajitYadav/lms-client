@@ -19,6 +19,7 @@ import Exam from './pages/student/Exam'
 import ExamResult from './pages/student/ExamResult'
 import AddExam from './pages/educator/AddExam'
 import ExamResults from './pages/educator/ExamResults'
+import Discussion from './pages/student/Discussion'
 
 const App = () => {
 
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/player/:courseId" element={<Player />} />
         <Route path="/exam/:courseId" element={<Exam />} />
         <Route path="/exam/result/:courseId" element={<ExamResult />} />
+        <Route path="/discussion/:courseId" element={<Discussion />} />
         <Route path="/loading/:path" element={<Loading />} />
 
         <Route path='/educator' element={<Educator />}>
