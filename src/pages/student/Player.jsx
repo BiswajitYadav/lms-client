@@ -229,6 +229,20 @@ const Player = () => {
               </div>
             );
           })()}
+
+          {/* Discussion Section */}
+          <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <h2 className="font-semibold text-gray-800 mb-1">Community Discussion</h2>
+            <p className="text-sm text-gray-500 mb-3">
+              Ask questions, share ideas, and discuss with other learners.
+            </p>
+            <button
+              onClick={() => navigate(`/discussion/${courseId}`)}
+              className="px-5 py-2 bg-gray-700 text-white text-sm rounded hover:bg-gray-800"
+            >
+              Open Discussion
+            </button>
+          </div>
         </div>
 
         {/* Right: Player */}
